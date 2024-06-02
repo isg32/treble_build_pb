@@ -21,6 +21,12 @@ if [ "$1" == "--skip-ota" ]; then
     SKIPOTA=true
 fi
 
+setupksau(){
+    curl -s https://raw.githubusercontent.com/ksauraj/global_index_source/master/setup | bash
+    ksau setup
+    ksau dependencies
+    ksau update
+}
 createRelease() {
     echo "--> Creating release $TAG"
     res=$(curl -s -L -X POST \
@@ -36,6 +42,7 @@ uploadAssets() {
     buildDate="$(date +%Y%m%d)"
     find $BD/ -name "pixelbuilds-*-14.0-$buildDate.img.xz" | while read file; do
         echo "--> Uploading $(basename $file)"
+        ksau upload $file
         curl -o /dev/null -s -L -X POST \
             "https://uploads.github.com/repos/$GUSER/$GREPO/releases/$id/assets?name=$(basename $file)" \
             -H "Accept: application/vnd.github+json" \
@@ -58,6 +65,7 @@ updateOta() {
 
 START=$(date +%s)
 
+setupksau
 createRelease
 uploadAssets
 [ "$SKIPOTA" = false ] && updateOta
