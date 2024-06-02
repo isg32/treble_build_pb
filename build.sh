@@ -2,20 +2,20 @@
 
 echo
 echo "--------------------------------------"
-echo "          AOSP 14.0 Buildbot          "
+echo "            PB 14.0 Buildbot          "
 echo "                  by                  "
-echo "                ponces                "
+echo "       Radhe adapted from ponces      "
 echo "--------------------------------------"
 echo
 
 set -e
 
-BL=$PWD/treble_aosp
+BL=$PWD/treble_build_pb
 BD=$HOME/builds
 
 initRepos() {
     echo "--> Initializing workspace"
-    repo init -u https://android.googlesource.com/platform/manifest -b android-14.0.0_r37 --git-lfs
+    repo init -u https://github.com/PixelBuildsROM/android_manifest -b unity --depth=1 --git-lfs
     echo
 
     echo "--> Preparing local manifest"
@@ -66,7 +66,7 @@ buildTrebleApp() {
 
 buildVariant() {
     echo "--> Building $1"
-    lunch "$1"-ap1a-userdebug
+    lunch "$1"-userdebug
     make -j$(nproc --all) installclean
     make -j$(nproc --all) systemimage
     make -j$(nproc --all) target-files-package otatools
@@ -106,7 +106,7 @@ generatePackages() {
         [[ "$filename" == *"_a64"* ]] && arch="arm32_binder64" || arch="arm64"
         [[ "$filename" == *"_bvN"* ]] && variant="vanilla" || variant="gapps"
         [[ "$filename" == *"-vndklite"* ]] && vndk="-vndklite" || vndk=""
-        name="aosp-${arch}-ab-${variant}${vndk}-14.0-$buildDate"
+        name="pixelbuilds-${arch}-ab-${variant}${vndk}-14.0-$buildDate"
         xz -cv "$file" -T0 > $BD/"$name".img.xz
     done
     rm -rf $BD/system-*.img
@@ -119,7 +119,7 @@ generateOta() {
     buildDate="$(date +%Y%m%d)"
     timestamp="$START"
     json="{\"version\": \"$version\",\"date\": \"$timestamp\",\"variants\": ["
-    find $BD/ -name "aosp-*-14.0-$buildDate.img.xz" | sort | {
+    find $BD/ -name "pixelbuilds-*-14.0-$buildDate.img.xz" | sort | {
         while read file; do
             filename="$(basename $file)"
             [[ "$filename" == *"-arm32"* ]] && arch="a64" || arch="arm64"
@@ -127,7 +127,7 @@ generateOta() {
             [[ "$filename" == *"-vndklite"* ]] && vndk="-vndklite" || vndk=""
             name="treble_${arch}_b${variant}N${vndk}"
             size=$(wc -c $file | awk '{print $1}')
-            url="https://github.com/ponces/treble_aosp/releases/download/$version/$filename"
+            url="https://github.com/isg32/treble_build_pe/releases/download/$version/$filename"
             json="${json} {\"name\": \"$name\",\"size\": \"$size\",\"url\": \"$url\"},"
         done
         json="${json%?}]}"
