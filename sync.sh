@@ -5,12 +5,13 @@ echo "--------------------------------------"
 echo "          AOSP 14.0 Syncbot           "
 echo "                  by                  "
 echo "                ponces                "
+echo "            Adapted for PB            "
 echo "--------------------------------------"
 echo
 
 set -e
 
-BL=$PWD/treble_aosp
+BL=$PWD/treble_build_pb
 TD="android-14.0"
 
 initRepos() {
