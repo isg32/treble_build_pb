@@ -2,19 +2,19 @@
 
 echo
 echo "--------------------------------------"
-echo "         AOSP 14.0 Uploadbot          "
+echo "           PB 14.0 Uploadbot          "
 echo "                  by                  "
-echo "                ponces                "
+echo "        radhe adapted from ponces     "
 echo "--------------------------------------"
 echo
 
 set -e
 
-BL=$PWD/treble_aosp
+BL=$PWD/treble_build_pb
 BD=$HOME/builds
 TAG="$(date +v%Y.%m.%d)"
-GUSER="ponces"
-GREPO="treble_aosp"
+GUSER="isg32"
+GREPO="treble_build_pb"
 
 SKIPOTA=false
 if [ "$1" == "--skip-ota" ]; then
@@ -34,7 +34,7 @@ createRelease() {
 
 uploadAssets() {
     buildDate="$(date +%Y%m%d)"
-    find $BD/ -name "aosp-*-14.0-$buildDate.img.xz" | while read file; do
+    find $BD/ -name "pixelbuilds-*-14.0-$buildDate.img.xz" | while read file; do
         echo "--> Uploading $(basename $file)"
         curl -o /dev/null -s -L -X POST \
             "https://uploads.github.com/repos/$GUSER/$GREPO/releases/$id/assets?name=$(basename $file)" \
